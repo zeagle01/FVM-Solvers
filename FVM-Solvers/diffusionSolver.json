@@ -3,7 +3,10 @@
 
 
 {
-   "mesh":{"class":"Cartisian_Gmesh_mesh","mesh_file":"structure_cavity.msh"} ,
+    
+    "solver":"laplace_solver",
+     "///////////////////////":"versatile_Gmesh_mesh/Gmesh_triangle_mesh ",  
+   "mesh":{"class":"versatile_Gmesh_mesh","mesh_file":"structure_cavity.msh"} ,
    
   "variable_num": "1",
   "gama":"1.0",

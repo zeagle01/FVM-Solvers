@@ -29,5 +29,29 @@
     <ClInclude Include="tool.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="solver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="configReader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="laplace.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="dataStructure.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="laplaceSolver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="solverRegister.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="linearEquationSolver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="printer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
