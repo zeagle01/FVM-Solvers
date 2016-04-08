@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FVM-Solvers", "FVM-Solvers\FVM-Solvers.vcxproj", "{F4328D6E-CCDF-4BD3-9831-6D10C3CF00AD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F4328D6E-CCDF-4BD3-9831-6D10C3CF00AD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F4328D6E-CCDF-4BD3-9831-6D10C3CF00AD}.Debug|Win32.Build.0 = Debug|Win32
+		{F4328D6E-CCDF-4BD3-9831-6D10C3CF00AD}.Release|Win32.ActiveCfg = Release|Win32
+		{F4328D6E-CCDF-4BD3-9831-6D10C3CF00AD}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

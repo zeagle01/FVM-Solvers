@@ -1,0 +1,40 @@
+
+
+
+
+{
+   "mesh":{"class":"Cartisian_Gmesh_mesh","mesh_file":"structure_cavity.msh"} ,
+   
+  "variable_num": "1",
+  "gama":"1.0",
+
+     
+   "boundary_conditions":
+     [        
+              "0","1","1",       
+            "0","1","0"         
+     ],    
+       
+       
+       
+         "////////////////////////":"Laplace/unstructure_Laplace ",  
+      "Laplace_operator":"Laplace" ,
+      
+      "cell_gradient":"GS_gradient",
+      
+       "face_average":[
+           {"type":"linear_average_beb"},
+           {"type":"linear_average_beo"}
+       ],
+      
+     "//////////////////////////1":"GS_iteration/OpenMP_Jacobi_iteration/GPU_Jacobi_iteration/GPU_Jacobi_Solver_vector ",    
+     "linear_equation_solvers"  :[
+         {"type":"GS_iteration","converge_threhold":"1e-6","max_step":"100000","check_step":"200"}
+     ],
+       
+   
+   "/////////////////////////":"tecplot_without_boundary/tecplot_unstructure (triangle/quadrilateral)",   
+  "printers": [
+         {"type" : "tecplot_unstructure","zone_type":"quadrilateral"}
+   ]
+}
