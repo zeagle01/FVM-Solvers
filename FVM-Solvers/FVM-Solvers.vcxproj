@@ -121,6 +121,8 @@
   <ItemGroup>
     <ClInclude Include="configReader.h" />
     <ClInclude Include="dataStructure.h" />
+    <ClInclude Include="faceReconstruct.h" />
+    <ClInclude Include="gradient.h" />
     <ClInclude Include="laplace.h" />
     <ClInclude Include="laplaceSolver.h" />
     <ClInclude Include="linearEquationSolver.h" />
