@@ -7,6 +7,7 @@
 #include <vector>
 #include "dataStructure.h"
 #include "serviceLocator.h"
+#include <sstream>
 using namespace std;
 class  A_Printer :public interface_t{
 
@@ -88,7 +89,10 @@ public:
 		fout << endl;
 		fout << "ZONE N = " << mesh->nodeNum << " E = " << mesh->cellNum << " ZONETYPE =fe" << zoneType << endl;;
 		fout << "DATAPACKING=BLOCK" << endl;
-		string s = phi.size() == 1 ? "" : "-" + 2 + phi.size();
+		stringstream ss;
+		ss << "-" << 2 + phi.size();
+		string s1 = ss.str();
+		string s = phi.size() == 1 ? ("") :s1;
 		fout << "VARLOCATION=([1-2]=NODAL,[3" << s << "]=CELLCENTERED)" << endl;
 		fout << endl;
 

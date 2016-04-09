@@ -7,6 +7,7 @@
 #include "serviceLocator.h"
 #include "solver.h"
 #include "laplaceSolver.h"
+#include "pressureCorrectionSolver.h"
 using namespace std;
 
 
@@ -23,6 +24,7 @@ public:
 	//register the class
 	void buildService(){
 		services.register_class<DiffusionSolver>("laplace_solver");
+		services.register_class<PressureCorrectionSolver>("pressure_correction_solver");
 	}
 
 	Solver* readSolver(string s){

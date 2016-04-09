@@ -64,6 +64,7 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\roaming vault config\boost.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
@@ -120,17 +121,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="configReader.h" />
+    <ClInclude Include="convection.h" />
     <ClInclude Include="dataStructure.h" />
+    <ClInclude Include="explicitDivergence.h" />
     <ClInclude Include="faceReconstruct.h" />
     <ClInclude Include="gradient.h" />
     <ClInclude Include="laplace.h" />
     <ClInclude Include="laplaceSolver.h" />
     <ClInclude Include="linearEquationSolver.h" />
     <ClInclude Include="mesh.h" />
+    <ClInclude Include="pressureCorrectionSolver.h" />
     <ClInclude Include="printer.h" />
     <ClInclude Include="serviceLocator.h" />
     <ClInclude Include="solver.h" />
     <ClInclude Include="solverRegister.h" />
+    <ClInclude Include="sourceTerm.h" />
+    <ClInclude Include="temporalTerm.h" />
     <ClInclude Include="tool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

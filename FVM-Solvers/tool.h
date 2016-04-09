@@ -3,7 +3,7 @@
 
 
 #include <vector>
-
+using namespace std;
 template<class T>class VectorMath {
 public:
 	static T outerdot(T x0, T y0, T x1, T y1) {
@@ -52,7 +52,7 @@ public:
 		return a < b ? a : b;
 	}
 
-	/*
+
 	static T rootOfSquareSum(vector<T> E1, vector<T> E2){
 	transform(E1.cbegin(), E1.cend(), E2.cbegin(), E2.begin(), minus<T>());
 	transform(E2.begin(), E2.end(), E2.begin(), E2.begin(), multiplies<T>());
@@ -61,7 +61,7 @@ public:
 	//	1, plus<T>(), plus<T>());
 	return sqrt(error);
 	}
-	*/
+
 
 	static T rootOfSquareSum(double* E1, double* E2, int n){
 		T sum = 0;

@@ -38,8 +38,9 @@ Line Loop(11) = {1,2,3,4};
 Line Loop(12) = {5,6,7,8};
 Plane Surface(13) = {11,12};
 
-
-Physical Line("outSide",1)={1,2,3,4};
+Physical Line("left",1)={4};
+Physical Line("right",2)={2};
+Physical Line("wall",1)={1,3};
 Physical Line("cylinder",2)={5,6,7,8};
 Physical Surface("flow_field",200)={13};
 

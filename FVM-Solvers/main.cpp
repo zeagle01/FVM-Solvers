@@ -6,7 +6,7 @@
 int main(){
 
 	boost::timer t;  //定义一个计时类，开始计时
-	string s = "diffusionSolver.json";
+	string s = "pressure_correction_solver.json";
 	SolverRegister solverRegister(s);
 	Solver* solver = solverRegister.readSolver("solver");
 	solver->solve();

@@ -21,6 +21,14 @@ public:
 		b.resize(mesh->cellNum);
 	}
 
+	static vector<CSR> plus(vector<CSR> E1, vector<CSR>E2){
+		vector<CSR> E3;
+		for (int i = 0; i < E1.size(); i++){
+			E3.push_back(plus(E1[i], E2[i]));
+		}
+		return E3;
+	}
+
 	static CSR plus(CSR E1, CSR E2){
 		CSR E3(E1);
 		//transform(E2.A.begin(), E2.A.end(), E2.A.begin(), coefficents, multiplies<double>());
@@ -29,6 +37,14 @@ public:
 		return E3;
 	}
 
+
+	static vector<CSR> minus(vector<CSR> E1, vector<CSR>E2){
+		vector<CSR> E3;
+		for (int i = 0; i < E1.size(); i++){
+			E3.push_back(minus(E1[i], E2[i]));
+		}
+		return E3;
+	}
 	static CSR minus(CSR E1, CSR E2){
 		CSR E3(E1);
 		transform(E2.A.begin(), E2.A.end(), E2.A.begin(), negate<double>());
@@ -75,6 +91,20 @@ public:
 			}
 		}
 
+	}
+
+	static CellField wrapInner(vector<double> innerField){
+		CellField cf;
+		cf.inner.assign(innerField.begin(), innerField.end());
+		return cf;
+	}
+	static  vector<CellField> wrapInner(vector<double> innerField,int n,Mesh* mesh){
+		vector<CellField> r;
+		for (int i = 0; i < n; i++){
+			vector<double> iFi(innerField.begin() + i*mesh->cellNum, innerField.begin() + (i + 1)*mesh->cellNum);
+			r.push_back(wrapInner(iFi));
+		}
+		return r;
 	}
 };
 

@@ -9,12 +9,33 @@ public:
 	vector<double> grad_f;
 	virtual CSR apply(vector<double> gama_f, CellField phi, Mesh* mesh) = 0;
 	virtual CSR apply(double  gama_f, CellField phi, Mesh* mesh) = 0;
+	virtual vector<CSR> apply(double gama_f, vector<CellField> phi, Mesh* mesh) = 0;
+	virtual vector<CSR> apply(double gama_f, vector<CellField*> phi, Mesh* mesh) = 0;
 };
 
 
 
 class Laplace :public I_Laplace, public member_t<Laplace> {
 public:
+
+	virtual vector<CSR> apply(double gama_f, vector<CellField*> phi, Mesh* mesh){
+		vector<CellField> phi1;
+		for (int i = 0; i < phi.size(); i++){
+			phi1.push_back(*(phi[i]));
+		}
+		return apply(gama_f, phi1, mesh);
+	}
+
+	virtual vector<CSR> apply(double gama_f, vector<CellField> phi, Mesh* mesh){
+		vector<CSR> r;
+		vector<double> gama_field(mesh->faceNum, gama_f);
+		for (int i = 0; i < phi.size(); i++){
+
+			CSR eq = apply(gama_field, phi[i], mesh);
+			r.push_back(eq);
+		}
+		return r;
+	}
 
 
 	virtual CSR apply(double gama_f, CellField phi, Mesh* mesh){

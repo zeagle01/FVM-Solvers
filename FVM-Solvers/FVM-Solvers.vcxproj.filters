@@ -68,5 +68,20 @@
     <ClInclude Include="gradient.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="pressureCorrectionSolver.h">
+      <Filter>solver</Filter>
+    </ClInclude>
+    <ClInclude Include="convection.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="temporalTerm.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="sourceTerm.h">
+      <Filter>operator</Filter>
+    </ClInclude>
+    <ClInclude Include="explicitDivergence.h">
+      <Filter>operator</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
