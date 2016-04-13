@@ -1,27 +1,39 @@
-// Inputs
-	lc=0.01;
-	lx=1.0;
-	ly=1.0;
- 
-        // Geometry
-	Point(1) = {0, 0, 0, lc};
-	Point(2) = {lx, 0, 0, lc};
-	Point(3) = {lx, ly, 0, lc};
-	Point(4) = {0, ly, 0, lc};
-	Line(1) = {1, 2};				// bottom line
-	Line(2) = {2, 3};				// right line
-	Line(3) = {3, 4};				// top line
-	Line(4) = {4, 1};				// left line
+lx=1.0;
+ly=1.0;
+nx=100;
+ny=100;
+
+bump_x=0.1;
+bump_y=0.1;
+
+
+Point(1)=(0,0,0);
+Point(2)=(lx,0,0);
+Point(3)=(lx,ly,0);
+Point(4)=(0,ly,0);
+
+
+Line(1)={1,2};
+Line(2)={2,3};
+Line(3)={3,4};
+Line(4)={4,1};
+
+
+
+Transfinite Line{1,-3}= nx Using Bump bump_x;
+Transfinite Line{2,-4}= ny Using Bump bump_y;
+
 	Line Loop(5) = {1, 2, 3, 4};
-	//Line Loop(7) = {4,1,2};  	
-	Plane Surface(6) = {5};
+		
+	Plane Surface(5) = {5};
+	
  
         //Transfinite surface:
-	Transfinite Surface {6};
-	Recombine Surface {6};
+	Transfinite Surface {5};
+	Recombine Surface {5};
 
-	Physical Line("driven_lid",1)={3};
+
+Physical Line("driven_lid",1)={3};
 	Physical Line("wall",2)={4,1,2};
 	Physical Surface("flow_field",200)={6};
- 
 

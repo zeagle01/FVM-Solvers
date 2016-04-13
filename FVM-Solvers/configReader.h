@@ -35,6 +35,8 @@ public:
 		services.register_class<VersatileGmeshMesh>("versatile_Gmesh_mesh");
 		services.register_class<Laplace>("Laplace");
 		services.register_class<UpwindConvection>("1st_upwind");
+		services.register_class<DefferCenterConvection>("DC_center");
+		services.register_class<ExplicitCenter>("explicit_center");
 		services.register_class<ImplictEuler>("1st_Euler");
 		services.register_class<GS_Solver>("GS_iteration");
 		services.register_class<UnstructurePrinter>("tecplot_unstructure");
@@ -57,7 +59,9 @@ public:
 	string readString(string s){
 		return pt.get_child(s).get_value<string>();
 	}
-
+	bool readBool(string s){	
+		return pt.get_child(s).get_value<bool>();
+	}
 
 
 	Mesh* readMeshClass(string s){

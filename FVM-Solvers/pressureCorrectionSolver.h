@@ -24,6 +24,7 @@ public:
 	B_RhieChow* rc;
 	I_SourceTerm* source;
 
+	bool relativePressure;
 
 	vector<CellField*> V;
 
@@ -48,6 +49,7 @@ public:
 		source = configReader->readSourceTerm("source_term_operator");
 		rc = configReader->readRhieChowInterpolation("Rhie_Chow");
 		div = configReader->readDivergence("explicit_divergence");
+		relativePressure = configReader->readBool("relative_pressure");
 		dt = temporal->dt;
 
 

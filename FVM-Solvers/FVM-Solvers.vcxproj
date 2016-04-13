@@ -126,6 +126,7 @@
     <ClInclude Include="explicitDivergence.h" />
     <ClInclude Include="faceReconstruct.h" />
     <ClInclude Include="gradient.h" />
+    <ClInclude Include="implicitCorrectionIBM.h" />
     <ClInclude Include="laplace.h" />
     <ClInclude Include="laplaceSolver.h" />
     <ClInclude Include="linearEquationSolver.h" />
