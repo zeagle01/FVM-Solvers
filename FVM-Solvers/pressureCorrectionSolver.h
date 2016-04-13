@@ -115,7 +115,9 @@ public:
 
 			les[0]->iterate(p_eq, p_prime, mesh, 1);
 			//les[0]->solve(p_eq, &p_prime, mesh);
-			setRelativePressure(p_prime);
+			if (relativePressure == true){
+				setRelativePressure(p_prime);
+			}
 			p_prime.assignBoundary(mesh);
 
 			vector<double> p_prime_f = faceReconstruct[0]->apply(p_prime, mesh);
