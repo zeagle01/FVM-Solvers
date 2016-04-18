@@ -11,7 +11,7 @@ int main(){
 	cout << "or just drag the CONFIG FILE(.json) into the console" << endl;
 	string s;
 	//getline(cin,s);
-	s = "pressure_correction_solver.json";
+	s = "cavity_flow.json";
 	boost::timer t;  //定义一个计时类，开始计时
 	SolverRegister solverRegister(s);
 	Solver* solver = solverRegister.readSolver("solver");
