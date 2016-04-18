@@ -37,6 +37,7 @@ public:
 		services.register_class<UpwindConvection>("1st_upwind");
 		services.register_class<DefferCenterConvection>("DC_center");
 		services.register_class<ExplicitCenter>("explicit_center");
+		services.register_class<ImplicitCenter>("implicit_center");
 		services.register_class<ImplictEuler>("1st_Euler");
 		services.register_class<GS_Solver>("GS_iteration");
 		services.register_class<UnstructurePrinter>("tecplot_unstructure");
