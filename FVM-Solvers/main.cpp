@@ -10,8 +10,8 @@ int main(){
 	cout << "input the CONFIG FILE(.json),press enter to finish the input" << endl;
 	cout << "or just drag the CONFIG FILE(.json) into the console" << endl;
 	string s;
-	//getline(cin,s);
-	s = "square_cylinder.json";
+	getline(cin,s);
+	//s = "square_cylinder.json";
 	boost::timer t;  //定义一个计时类，开始计时
 	SolverRegister solverRegister(s);
 	Solver* solver = solverRegister.readSolver("solver");
