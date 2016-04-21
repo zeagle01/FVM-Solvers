@@ -20,5 +20,6 @@ int main(){
 
 	std::cout << "computation time£º" << t.elapsed() << std::endl;
 	system("pause");
+	//no ff merge;
 	return 0;
 }
