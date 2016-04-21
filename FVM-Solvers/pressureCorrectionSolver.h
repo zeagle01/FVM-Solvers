@@ -24,6 +24,7 @@ public:
 	B_RhieChow* rc;
 	I_SourceTerm* source;
 
+	bool relativePressure;
 
 	vector<CellField*> V;
 
@@ -48,6 +49,7 @@ public:
 		source = configReader->readSourceTerm("source_term_operator");
 		rc = configReader->readRhieChowInterpolation("Rhie_Chow");
 		div = configReader->readDivergence("explicit_divergence");
+		relativePressure = configReader->readBool("relative_pressure");
 		dt = temporal->dt;
 
 
@@ -113,7 +115,9 @@ public:
 
 			les[0]->iterate(p_eq, p_prime, mesh, 1);
 			//les[0]->solve(p_eq, &p_prime, mesh);
-			setRelativePressure(p_prime);
+			if (relativePressure == true){
+				setRelativePressure(p_prime);
+			}
 			p_prime.assignBoundary(mesh);
 
 			vector<double> p_prime_f = faceReconstruct[0]->apply(p_prime, mesh);
