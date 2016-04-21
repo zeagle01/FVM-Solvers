@@ -83,5 +83,8 @@
     <ClInclude Include="explicitDivergence.h">
       <Filter>operator</Filter>
     </ClInclude>
+    <ClInclude Include="implicitCorrectionIBM.h">
+      <Filter>solver</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

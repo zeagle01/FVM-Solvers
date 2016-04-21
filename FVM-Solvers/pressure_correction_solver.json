@@ -5,7 +5,7 @@
 {
     
     "solver":"pressure_correction_solver",
-     "///////////////////////":"versatile_Gmesh_mesh/Gmesh_triangle_mesh ",  
+     "///////////////////////mesh":"versatile_Gmesh_mesh/Gmesh_triangle_mesh ",  
    "mesh":{"class":"versatile_Gmesh_mesh","mesh_file":"structure_cavity.msh"} ,
    
   "variable_num": "3",
@@ -14,6 +14,7 @@
   "check_step":"100",
   "max_step":"20000",
   "converge_threhold":"1e-6",
+    "relative_pressure":"true", 
      
    "boundary_conditions":
      [        
@@ -29,11 +30,13 @@
        
        
        
-         "////////////////////////":"Laplace/unstructure_Laplace ",  
+         "//////////////////////// Laplace_operator":"Laplace/unstructure_Laplace ",  
       "Laplace_operator":"Laplace" ,
       
-      "convection_operator":"1st_upwind",
+      "/////////////////////////// convection_operator":"1st_upwind/DC_center/explicit_center",
+      "convection_operator":"DC_center",
       "source_term_operator":"field_source_term",
+      
       
       "temporal_scheme":"1st_Euler",
       
@@ -46,7 +49,7 @@
            {"type":"linear_average_beo"}
        ],
       
-     "//////////////////////////1":"GS_iteration/OpenMP_Jacobi_iteration/GPU_Jacobi_iteration/GPU_Jacobi_Solver_vector ",    
+     "//////////////////////////linear_equation_solvers":"GS_iteration/OpenMP_Jacobi_iteration/GPU_Jacobi_iteration/GPU_Jacobi_Solver_vector ",    
      "linear_equation_solvers"  :[
          {"type":"GS_iteration","converge_threhold":"1e-6","max_step":"100000","check_step":"200"}
      ],
