@@ -36,10 +36,11 @@ public:
 			//#pragma omp parallel for
 			for (int c = 0; c < mesh->cellNum; c++) {
 				double temp = 0;
-				for (int i = mesh->IA[c] + 1; i < mesh->IA[c + 1]; i++) {
+				for (int i = mesh->IA[c]; i < mesh->IA[c + 1]; i++) {
+					if (mesh->JA[i] != c)
 					temp += eq.A[i] * phi.inner[mesh->JA[i]];
 				}
-				phi.inner[c] = (eq.b[c] - temp) / eq.A[mesh->IA[c]];
+				phi.inner[c] = (eq.b[c] - temp) / eq.A[mesh->DA[c]];
 			}
 		}
 	}

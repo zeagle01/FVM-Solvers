@@ -58,10 +58,10 @@ public:
 			double diffusion_no = diffusion_on;
 			double diffusion_nn = -diffusion_on;
 
-			eq.A[mesh->IA[owner]] += diffusion_oo;
+			eq.A[mesh->DA[owner]] += diffusion_oo;
 			eq.A[mesh->ON[f * 2 + 0]] += diffusion_on;
-			eq.A[mesh->IA[neighbor]] += diffusion_nn;
-			eq.A[mesh->ON[f * 2 + 1]] += diffusion_no;
+			eq.A[mesh->DA[neighbor]] += diffusion_nn;
+			eq.A[mesh->ON[f * 2+1]] += diffusion_no;
 		}
 
 		for (int pat = 0; pat < mesh->boundaryPatchNum; pat++) {
@@ -76,7 +76,7 @@ public:
 				double a = phi.boundaryCondition[pat * 3 + 0];
 				double b1 = phi.boundaryCondition[pat * 3 + 1];
 				double c = phi.boundaryCondition[pat * 3 + 2];
-				eq.A[mesh->IA[owner]] += diffusion_oo + a / d / (a / d + b1)*diffusion_on;
+				eq.A[mesh->DA[owner]] += diffusion_oo + a / d / (a / d + b1)*diffusion_on;
 				eq.b[owner] -= c / (a / d + b1)*diffusion_on;
 			}
 		}

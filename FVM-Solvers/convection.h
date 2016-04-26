@@ -50,10 +50,10 @@ public:
 			double mdot = u_f[inerF] * Sf_x + v_f[inerF] * Sf_y;
 			//cout << mdot << endl;
 			eq.A[mesh->ON[f * 2 + 0]] = VectorMath<double>::myMin(mdot, 0);
-			eq.A[mesh->IA[owner]] += VectorMath<double>::myMax(mdot, 0);
+			eq.A[mesh->DA[owner]] += VectorMath<double>::myMax(mdot, 0);
 
 			eq.A[mesh->ON[f * 2 + 1]] = VectorMath<double>::myMin(-mdot, 0);
-			eq.A[mesh->IA[neighbor]] += VectorMath<double>::myMax(-mdot, 0);
+			eq.A[mesh->DA[neighbor]] += VectorMath<double>::myMax(-mdot, 0);
 			//copy(eq->A.begin(), eq->A.end(), ostream_iterator<double>(cout, " "));
 
 		}
@@ -75,7 +75,7 @@ public:
 				double c = phi.boundaryCondition[pat * 3 + 2];
 				double d = mesh->F_d[boundaryF];
 
-				eq.A[mesh->IA[owner]] += convection_oo + a / d / (a / d + b1)*convection_on;
+				eq.A[mesh->DA[owner]] += convection_oo + a / d / (a / d + b1)*convection_on;
 				eq.b[owner] -= c / (a / d + b1)*convection_on;
 			}
 		}
@@ -104,7 +104,7 @@ public :
 			double a_on = VectorMath<double>::myMin(mdot, 0);
 			double a_oo = VectorMath<double>::myMax(mdot, 0);
 			eq.A[mesh->ON[f * 2 + 0]] = a_on;
-			eq.A[mesh->IA[owner]] += a_oo;
+			eq.A[mesh->DA[owner]] += a_oo;
 
 			//eq.b[owner] += a_oo*phi.inner[owner] + a_on*phi.inner[neighbor] + mdot*phi_f[inerF];//Deffer correction
 			eq.b[owner] += a_oo*phi.inner[owner] + a_on*phi.inner[neighbor] - mdot*phi_f[inerF];//Deffer correction
@@ -113,7 +113,7 @@ public :
 			double a_no = VectorMath<double>::myMin(-mdot, 0);
 			double a_nn = VectorMath<double>::myMax(-mdot, 0);
 			eq.A[mesh->ON[f * 2 + 1]] = a_no;
-			eq.A[mesh->IA[neighbor]] += a_nn;
+			eq.A[mesh->DA[neighbor]] += a_nn;
 
 			//eq.b[neighbor] += a_nn*phi.inner[neighbor] + a_no*phi.inner[owner] - mdot*phi_f[inerF];//Deffer correction
 			eq.b[neighbor] += a_nn*phi.inner[neighbor] + a_no*phi.inner[owner] + mdot*phi_f[inerF];//Deffer correction
@@ -138,7 +138,7 @@ public :
 				double c = phi.boundaryCondition[pat * 3 + 2];
 				double d = mesh->F_d[boundaryF];
 
-				eq.A[mesh->IA[owner]] += a_oo + a / d / (a / d + b1)*a_on;
+				eq.A[mesh->DA[owner]] += a_oo + a / d / (a / d + b1)*a_on;
 				eq.b[owner] -= c / (a / d + b1)*a_on;
 				//eq.b[owner] += a_oo*phi.inner[owner] + a_on*phi.boundary[f] + mdot*phi_f[boundaryF];
 				eq.b[owner] += a_oo*phi.inner[owner] + a_on*phi.boundary[f] - mdot*phi_f[boundaryF];
@@ -215,10 +215,10 @@ public:
 			double g2 = sqrt((x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1));
 			//cout << mdot << endl;
 			eq.A[mesh->ON[f * 2 + 0]] = g2 / (g1 + g2)*mdot;
-			eq.A[mesh->IA[owner]] += g1 / (g1 + g2)*mdot;
+			eq.A[mesh->DA[owner]] += g1 / (g1 + g2)*mdot;
 
 			eq.A[mesh->ON[f * 2 + 1]] = g1 / (g1 + g2)*(-mdot);
-			eq.A[mesh->IA[neighbor]] += g2 / (g1 + g2)*(-mdot);
+			eq.A[mesh->DA[neighbor]] += g2 / (g1 + g2)*(-mdot);
 			//copy(eq->A.begin(), eq->A.end(), ostream_iterator<double>(cout, " "));
 
 		}
@@ -239,7 +239,7 @@ public:
 				double c = phi.boundaryCondition[pat * 3 + 2];
 				double d = mesh->F_d[boundaryF];
 
-				eq.A[mesh->IA[owner]] +=  a / d / (a / d + b1)*convection_on;
+				eq.A[mesh->DA[owner]] +=  a / d / (a / d + b1)*convection_on;
 				eq.b[owner] -= c / (a / d + b1)*convection_on;
 			}
 		}

@@ -23,7 +23,7 @@ public:
 	virtual CSR apply(CellField phi, Mesh* mesh) {
 		CSR eq(mesh);
 		for (int c = 0; c<mesh->cellNum; c++){
-			eq.A[mesh->IA[c]] = mesh->C_v[c] / dt;
+			eq.A[mesh->DA[c]] = mesh->C_v[c] / dt;
 			eq.b[c] = phi.inner[c] * mesh->C_v[c] / dt;
 		}
 		return eq;
