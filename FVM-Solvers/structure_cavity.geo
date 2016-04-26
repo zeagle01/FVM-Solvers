@@ -1,10 +1,10 @@
 lx=1.0;
 ly=1.0;
-nx=100;
-ny=100;
+nx=53;
+ny=53;
 
-bump_x=0.1;
-bump_y=0.1;
+bump_x=1.0;
+bump_y=1.0;
 
 
 Point(1)=(0,0,0);
@@ -35,5 +35,5 @@ Transfinite Line{2,-4}= ny Using Bump bump_y;
 
 Physical Line("driven_lid",1)={3};
 	Physical Line("wall",2)={4,1,2};
-	Physical Surface("flow_field",200)={6};
+	Physical Surface("flow_field",200)={5};
 
