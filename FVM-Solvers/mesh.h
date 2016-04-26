@@ -3,6 +3,7 @@
 
 
 #include <vector>
+#include <list>
 #include <array>
 #include <algorithm>
 #include <cmath>
@@ -57,7 +58,7 @@ public:
 	vector<int> IA;
 	vector<int> JA;
 	vector<int> ON;
-
+	vector<int> DA;
 
 	virtual void buildMeshData() = 0;
 
@@ -102,6 +103,7 @@ public:
 		 IA=mesh->IA;
 		JA=mesh->JA;
 		 ON=mesh->ON;
+		 DA = mesh->DA;
 	}
 
 };
@@ -112,7 +114,9 @@ public:
 class GmeshTriangleMesh_Imp:public Mesh{
 public:
 	vector<int> F_sort;
-
+	vector<list<int>> JA_l;
+	vector<list<int>::iterator> ON_it;
+	vector<list<int>::iterator> DA_it;
 
 	virtual void buildMeshData(){
 		ReadFromGshFile(meshFile);
@@ -379,23 +383,83 @@ public:
 			IA[i]++;
 			IA[i] += IA[i - 1];
 		}
-		JA.resize(IA[cellNum]);
-		vector<int> count(cellNum);
-		ON.resize(innerFaceNum * 2);
+		JA_l.resize(cellNum,list<int>());
+		ON_it.resize(innerFaceNum * 2,list<int>::iterator());
+		DA_it.resize(cellNum, list<int>::iterator());
 		for (int f = 0; f<innerFaceNum; f++){
 			int innerF = IF[innerFaceBegin] + f;
 			int owner = FC[innerF * 2 + 0];
 			int neighbor = FC[innerF * 2 + 1];
-			JA[IA[owner]] = owner;
-			count[owner]++;
-			ON[f * 2 + 0] = IA[owner] + count[owner];
-			JA[ON[f * 2 + 0]] = neighbor;
 
-			JA[IA[neighbor]] = neighbor;
-			count[neighbor]++;
-			ON[f * 2 + 1] = IA[neighbor] + count[neighbor];
-			JA[ON[f * 2 + 1]] = owner;
+			insertJA(owner, owner,owner);
+			insertJA(owner, neighbor,  f*2+0);
+			insertJA(neighbor, neighbor, neighbor);
+			insertJA(neighbor, owner,  f * 2+1);
 		}
+		JA.resize(IA[cellNum]);
+		
+		for (int c = 0; c < cellNum; c++){
+			int i = IA[c];
+			for (list<int>::iterator it = JA_l[c].begin(); it != JA_l[c].end();it++){
+				JA[i] = *it;
+				i++;
+			}
+		}
+		ON.resize(innerFaceNum * 2);
+		DA.resize(cellNum);
+		for (int f = 0; f < innerFaceNum; f++){
+			int innerF = IF[innerFaceBegin] + f;
+			int owner = FC[innerF * 2 + 0];
+			int neighbor = FC[innerF * 2 + 1];
+			mapON_it2ON(owner, owner,DA,DA_it);
+			mapON_it2ON(owner, f * 2 + 0,ON,ON_it);
+			mapON_it2ON(neighbor, neighbor,DA,DA_it);
+			mapON_it2ON(neighbor, f * 2 + 1,ON,ON_it);
+		}
+	}
+	void mapON_it2ON(int c, int f, vector<int>& data,vector<list<int>::iterator>& pointer){
+		int offset = 0;
+		for (list<int>::iterator it = JA_l[c].begin(); it != pointer[f]; it++){
+			offset++;
+		}
+		data[f] = IA[c] + offset;
+	}
+
+	void insertJA(int c, int c2,int f){
+		if (JA_l[c].empty()){
+			JA_l[c].push_front(c2);
+			if (c==c2){
+				DA_it[f] = JA_l[c].begin();
+			}
+			else{
+				ON_it[f] = JA_l[c].begin();
+			}
+			return;
+		}
+		for (list<int>::iterator it = JA_l[c].begin(); it != JA_l[c].end();it++){
+			if (c2 == *it){
+				DA_it[f] = it;
+				return;
+			}
+			if (it == JA_l[c].begin() && c2 < *it){
+					JA_l[c].push_front(c2);
+					ON_it[f] = JA_l[c].begin();
+					return;
+			}
+			if (it != JA_l[c].end()){
+					list<int>::iterator suc = it;
+					suc++;
+					if (suc != JA_l[c].end() && c2>*it&&c2 < *suc || suc == JA_l[c].end() && c2>*it){
+						JA_l[c].insert(suc, c2);
+						suc--;
+						ON_it[f] = suc;
+						return;
+					}
+
+			}
+
+		}
+
 	}
 
 
@@ -804,6 +868,9 @@ public:
 	}
 
 };
+
+
+
 
 
 
