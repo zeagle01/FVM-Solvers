@@ -39,7 +39,10 @@ public:
 		services.register_class<ExplicitCenter>("explicit_center");
 		services.register_class<ImplicitCenter>("implicit_center");
 		services.register_class<ImplictEuler>("1st_Euler");
+
 		services.register_class<GS_Solver>("GS_iteration");
+		services.register_class<GMRES>("GMRES");
+
 		services.register_class<UnstructurePrinter>("tecplot_unstructure");
 		services.register_class<FaceReconstruct_BEB>("linear_average_beb");
 		services.register_class<LinearFaceReconstruct_BEO>("linear_average_beo");
