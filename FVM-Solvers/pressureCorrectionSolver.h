@@ -113,11 +113,13 @@ public:
 				p_eq.b[c] = mdot[c] * mesh->C_v[c] / dt;
 			}
 
-			les[0]->iterate(p_eq, p_prime, mesh, 1);
-			//les[0]->solve(p_eq, &p_prime, mesh);
+			//les[1]->iterate(p_eq, p_prime, mesh, 1);
+			les[1]->solve(p_eq, p_prime, mesh);
+			
 			if (relativePressure == true){
 				setRelativePressure(p_prime);
 			}
+			
 			p_prime.assignBoundary(mesh);
 
 			vector<double> p_prime_f = faceReconstruct[0]->apply(p_prime, mesh);
