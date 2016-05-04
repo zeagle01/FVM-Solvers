@@ -104,6 +104,13 @@ public:
 			r[i] = -r[i];
 		}
 	}
+	static void copyArray(double* x, int n, double* x_new){
+		for (int i = 0; i < n; i++){
+			x_new[i] = x[i];
+		}
+	}
+
+
 };
 
 #endif

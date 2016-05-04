@@ -9,9 +9,9 @@
    "mesh":{"class":"versatile_Gmesh_mesh","mesh_file":"structure_cavity.msh"} ,
    
   "variable_num": "3",
-  "dt":"1e20",
-  "Re":"100",
-  "check_step":"100",
+  "dt":"1",
+  "Re":"0.1",
+  "check_step":"200",
   "max_step":"50000",
   "converge_threhold":"1e-6",
     "relative_pressure":"true", 
@@ -49,9 +49,10 @@
            {"type":"linear_average_beo"}
        ],
       
-     "//////////////////////////linear_equation_solvers":"GS_iteration/OpenMP_Jacobi_iteration/GPU_Jacobi_iteration/GPU_Jacobi_Solver_vector ",    
+     "//////////////////////////linear_equation_solvers":"GS_iteration/OpenMP_Jacobi_iteration/GPU_Jacobi_iteration/GPU_Jacobi_Solver_vector/GMRES ",    
      "linear_equation_solvers"  :[
-         {"type":"GS_iteration","converge_threhold":"1e-6","max_step":"100000","check_step":"200"}
+         {"type":"GS_iteration","converge_threhold":"1e-6","max_step":"100000","check_step":"200"},
+         {"type":"GMRES","converge_threhold":"1e-6","max_step":"100000","check_step":"1"}
      ],
        
    
