@@ -187,19 +187,22 @@ public:
 			CSR::MatrixVectorMul(A, IA, JA, x, n,V);
 			VectorMath<double>::plus_minus(-1, b, n, V);
 			VectorMath<double>::reverse(V,n);
-			vector<double> temp_v(V, V + n);
-			double* temp = temp_v.data();
-			pre->solve(A,mesh->DA.data(), IA, JA,temp,n, V);
-
+			if (pre){
+				vector<double> temp_v(V, V + n);
+				double* temp = temp_v.data();
+				pre->solve(A, mesh->DA.data(), IA, JA, temp, n, V);
+			}
 			double beta = VectorMath<double>::length(V, n);
 			b_hat[0] = beta;
 			VectorMath<double>::scalarMul(1.0 / beta, n, V);
 			int i = 0;
 			for (i = 0; i < m; i++){
 				CSR::MatrixVectorMul(A, IA, JA, V + i*n, n,V + (i + 1)*n);
-				vector<double> temp_v(V + (i + 1)*n, V + (i + 2)*n);
-				double* temp = temp_v.data();
-				pre->solve(A, mesh->DA.data(), IA, JA, temp, n, V + (i + 1)*n);
+				if (pre){
+					vector<double> temp_v(V + (i + 1)*n, V + (i + 2)*n);
+					double* temp = temp_v.data();
+					pre->solve(A, mesh->DA.data(), IA, JA, temp, n, V + (i + 1)*n);
+				}
 				for (int j = 0; j <= i; j++){
 					H[j + i*(m + 1)] = VectorMath<double>::dot(V + j*n, V + (i + 1)*n, n);
 					VectorMath<double>::plus_minus(-H[j + i*(m + 1)], V + j*n, n, V + (i + 1)*n);
