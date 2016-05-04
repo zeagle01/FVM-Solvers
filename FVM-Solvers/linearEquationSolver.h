@@ -5,46 +5,149 @@
 #include "dataStructure.h"
 #include "mesh.h"
 #include "serviceLocator.h"
+
+
+
+
+class I_Preconditioner :public interface_t{
+public:
+	virtual void solve(double* A, int*DA, int* IA, int* JA, double* b, int n, double* x) = 0;
+};
+
+class GS_Precondition : public I_Preconditioner, public member_t<GS_Precondition>{
+public:
+	virtual void solve(double* A, int*DA, int* IA, int* JA, double* b, int n, double* x) {
+		x[0] = b[0] / A[0];
+		for (int i = 1; i < n; i++){
+			double temp = 0;
+			int j = 0;
+			for (j = IA[i]; j < IA[i + 1]; j++){
+				if (JA[j] < i){
+					temp += A[j] * x[JA[j]];
+				}
+				else if (JA[j] == i){
+					break;
+				}
+			}
+			x[i] = (b[i] - temp) / A[j];
+		}
+	}
+};
+
+class Jacobi_Precondition : public I_Preconditioner, public member_t<Jacobi_Precondition>{
+public:
+	virtual void solve(double* A, int*DA, int* IA, int* JA, double* b, int n, double* x) {
+		for (int i = 0; i < n; i++){
+			for (int j = IA[i]; j < IA[i + 1]; j++){
+				if (JA[j] == i){
+					x[i] = b[i] / A[j];
+				}
+			}
+		}
+	}
+};
+
+class LUSGS_Precondition : public I_Preconditioner, public member_t<LUSGS_Precondition>{
+public:
+	virtual void solve(double* A, int*DA, int* IA, int* JA, double* b, int n, double* x) {
+		vector<double> y_v(n);
+		double *y = y_v.data();
+		y[0] = b[0];
+		for (int i = 1; i < n; i++){
+			double temp = 0;
+			int j = 0;
+			for (j = IA[i]; j < IA[i + 1]; j++){
+				if (JA[j] < i){
+					temp += A[j] / A[DA[JA[j]]] * y[JA[j]];
+				}
+				else if (JA[j] == i){
+					break;
+				}
+			}
+			y[i] = (b[i] - temp);
+		}
+		x[n - 1] = y[n - 1] / A[DA[n - 1]];
+		for (int i = n - 2; i >= 0; i--){
+			double temp = 0;
+			for (int j = IA[i]; j < IA[i + 1]; j++){
+				if (JA[j]>i){
+					temp += A[j] * x[JA[j]];
+				}
+				else if (JA[j] == i){
+					break;
+				}
+			}
+			x[i] = (y[i] - temp) / A[DA[i]];
+		}
+	}
+};
+
+
 class I_LinearEquationSolver :public interface_t{
 
 public:
 	double converge_threhold;
 	int max_step;
 	int check_step;
-	virtual void solve(CSR eq, CellField& phi, Mesh* mesh){
-		double error = 0; int step = 0;
-		CellField pre;
-		do{
-			if (step%check_step == 0){
-				pre = phi;
-			}
-			iterate(eq, phi, mesh, 1);
-			if (step%check_step == 0){
-				error = VectorMath<double>::rootOfSquareSum(phi.inner.data(), pre.inner.data(), phi.inner.size());
-			}
-			step++;
-		} while (error>converge_threhold&&step<max_step);
-	}
-	virtual void iterate(CSR eq, CellField& phi, Mesh* mesh, int iterateTimes) = 0;
+	I_Preconditioner* pre;
+	virtual void solve(CSR eq, CellField& phi, Mesh* mesh) = 0;
 };
 
 
 class  GS_Solver : public I_LinearEquationSolver, public member_t<GS_Solver>{
 public:
-	virtual void iterate(CSR eq, CellField& phi, Mesh* mesh, int iterateTimes) {
-		for (int it = 0; it < iterateTimes; ++it){
+	virtual void solve(CSR eq, CellField& phi, Mesh* mesh){
+		for (int it = 0; it < max_step; ++it){
+			vector<double> x_old = phi.inner;
 			for (int c = 0; c < mesh->cellNum; c++) {
 				double temp = 0;
 				for (int i = mesh->IA[c]; i < mesh->IA[c + 1]; i++) {
 					if (mesh->JA[i] != c)
-					temp += eq.A[i] * phi.inner[mesh->JA[i]];
+						temp += eq.A[i] * phi.inner[mesh->JA[i]];
 				}
 				phi.inner[c] = (eq.b[c] - temp) / eq.A[mesh->DA[c]];
+			}
+			
+			if (it%check_step == 0){
+				double e_x = VectorMath<double>::rootOfSquareSum(phi.inner.data(), x_old.data(), mesh->cellNum);
+				if (e_x < converge_threhold) {	
+					break;
+				}
 			}
 		}
 	}
 
 };
+
+class  Jacobi_Solver : public I_LinearEquationSolver, public member_t<Jacobi_Solver>{
+public:
+	virtual void solve(CSR eq, CellField& phi, Mesh* mesh){
+		for (int it = 0; it < max_step; ++it){
+			vector<double> x_old = phi.inner;
+			for (int c = 0; c < mesh->cellNum; c++) {
+				double temp = 0;
+				for (int i = mesh->IA[c]; i < mesh->IA[c + 1]; i++) {
+					if (mesh->JA[i] != c)
+						temp += eq.A[i] * x_old[mesh->JA[i]];
+				}
+				phi.inner[c] = (eq.b[c] - temp) / eq.A[mesh->DA[c]];
+			}
+
+			if (it%check_step == 0){
+				double e_x = VectorMath<double>::rootOfSquareSum(phi.inner.data(), x_old.data(), mesh->cellNum);
+				if (e_x < converge_threhold) {
+					break;
+				}
+			}
+		}
+	}
+	//virtual void iterate(CSR eq, CellField& phi, Mesh* mesh, int iterateTimes) {}
+
+};
+
+
+
+
 
 
 
@@ -84,12 +187,19 @@ public:
 			CSR::MatrixVectorMul(A, IA, JA, x, n,V);
 			VectorMath<double>::plus_minus(-1, b, n, V);
 			VectorMath<double>::reverse(V,n);
+			vector<double> temp_v(V, V + n);
+			double* temp = temp_v.data();
+			pre->solve(A,mesh->DA.data(), IA, JA,temp,n, V);
+
 			double beta = VectorMath<double>::length(V, n);
 			b_hat[0] = beta;
 			VectorMath<double>::scalarMul(1.0 / beta, n, V);
 			int i = 0;
 			for (i = 0; i < m; i++){
 				CSR::MatrixVectorMul(A, IA, JA, V + i*n, n,V + (i + 1)*n);
+				vector<double> temp_v(V + (i + 1)*n, V + (i + 2)*n);
+				double* temp = temp_v.data();
+				pre->solve(A, mesh->DA.data(), IA, JA, temp, n, V + (i + 1)*n);
 				for (int j = 0; j <= i; j++){
 					H[j + i*(m + 1)] = VectorMath<double>::dot(V + j*n, V + (i + 1)*n, n);
 					VectorMath<double>::plus_minus(-H[j + i*(m + 1)], V + j*n, n, V + (i + 1)*n);
@@ -131,13 +241,15 @@ public:
 			for (int k = 0; k < i; k++){
 				VectorMath<double>::plus_minus(y[k], V + k*n, n,x);
 			}
-			double e_x = VectorMath<double>::rootOfSquareSum(x,x_old, n);
-			if (e_x < converge_threhold){
-				break;
+			if (it%check_step == 0){
+				double e_x = VectorMath<double>::rootOfSquareSum(x, x_old, n);
+				if (e_x < converge_threhold) {
+					break;
+				}
 			}
 		}
 	}
-	virtual void iterate(CSR eq, CellField& phi, Mesh* mesh, int iterateTimes) {}
+	//virtual void iterate(CSR eq, CellField& phi, Mesh* mesh, int iterateTimes) {}
 };
 
 

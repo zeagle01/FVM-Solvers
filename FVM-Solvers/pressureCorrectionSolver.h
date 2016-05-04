@@ -93,10 +93,10 @@ public:
 
 			V_momentum = CSR::plus(V_momentum, sourceTerm);
 
-			les[0]->iterate(V_momentum[0], phi[0], mesh, 1);
-			les[0]->iterate(V_momentum[1], phi[1], mesh, 1);
-			//les[0]->solve(u_momentum, phi[0],mesh);
-			//les[0]->solve(v_momentum, phi[1], mesh);
+			//les[0]->iterate(V_momentum[0], phi[0], mesh, 1);
+			//les[0]->iterate(V_momentum[1], phi[1], mesh, 1);
+			les[0]->solve(V_momentum[0], phi[0], mesh);
+			les[0]->solve(V_momentum[1], phi[1], mesh);
 			phi[0].assignBoundary(mesh);
 			phi[1].assignBoundary(mesh);
 

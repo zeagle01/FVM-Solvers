@@ -9,8 +9,8 @@
    "mesh":{"class":"versatile_Gmesh_mesh","mesh_file":"structure_cavity.msh"} ,
    
   "variable_num": "3",
-  "dt":"1",
-  "Re":"0.1",
+  "dt":"1e50",
+  "Re":"400",
   "check_step":"200",
   "max_step":"50000",
   "converge_threhold":"1e-6",
@@ -34,7 +34,7 @@
       "Laplace_operator":"Laplace" ,
       
       "/////////////////////////// convection_operator":"1st_upwind/DC_center/explicit_center/implicit_center",
-      "convection_operator":"DC_center",
+      "convection_operator":"1st_upwind",
       "source_term_operator":"field_source_term",
       
       
@@ -49,10 +49,11 @@
            {"type":"linear_average_beo"}
        ],
       
-     "//////////////////////////linear_equation_solvers":"GS_iteration/OpenMP_Jacobi_iteration/GPU_Jacobi_iteration/GPU_Jacobi_Solver_vector/GMRES ",    
+     "//////////////////////////linear_equation_solvers":"GS_iteration/Jacobi_iteration/OpenMP_Jacobi_iteration/GPU_Jacobi_iteration/GPU_Jacobi_Solver_vector/GMRES(GS/Jacobi/LUSGS_precondition) ", 
+        
      "linear_equation_solvers"  :[
-         {"type":"GS_iteration","converge_threhold":"1e-6","max_step":"100000","check_step":"200"},
-         {"type":"GMRES","converge_threhold":"1e-6","max_step":"100000","check_step":"1"}
+         {"type":"GS_iteration","converge_threhold":"1e-6","max_step":"1","check_step":"200"},
+         {"type":"GMRES","converge_threhold":"1e-6","max_step":"1","check_step":"200","preconditioner":"GS_precondition"}
      ],
        
    

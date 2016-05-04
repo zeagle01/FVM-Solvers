@@ -41,7 +41,12 @@ public:
 		services.register_class<ImplictEuler>("1st_Euler");
 
 		services.register_class<GS_Solver>("GS_iteration");
+		services.register_class<Jacobi_Solver>("Jacobi_iteration");
 		services.register_class<GMRES>("GMRES");
+
+		services.register_class<GS_Precondition>("GS_precondition");
+		services.register_class<Jacobi_Precondition>("Jacobi_precondition");
+		services.register_class<LUSGS_Precondition>("LUSGS_precondition");
 
 		services.register_class<UnstructurePrinter>("tecplot_unstructure");
 		services.register_class<FaceReconstruct_BEB>("linear_average_beb");
@@ -121,6 +126,12 @@ public:
 			r.back()->converge_threhold = vt.second.get_child("converge_threhold").get_value<double>();
 			r.back()->max_step = vt.second.get_child("max_step").get_value<int>();
 			r.back()->check_step = vt.second.get_child("check_step").get_value<int >();
+			//boost::optional<boost::property_tree::ptree& > child = node.get_child_optional("possibly_missing_node");
+			if (vt.second.get_child_optional("preconditioner")){
+				string precondition_type = vt.second.get_child("preconditioner").get_value<string>();
+				r.back()->pre = services.get_single_instance<I_Preconditioner>(precondition_type);
+			}
+
 		}
 		return r;
 	}
