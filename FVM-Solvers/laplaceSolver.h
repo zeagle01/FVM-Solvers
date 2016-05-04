@@ -25,6 +25,7 @@ public:
 		config();
 		
 		CSR eq = diffusion->apply(gama, phi[0], mesh);
+		//les[0]->solve(eq, phi[0], mesh);
 		les[0]->solve(eq, phi[0], mesh);
 		phi[0].assignBoundary(mesh);
 		printers[0]->print("out.dat",mesh, phi);

@@ -3,6 +3,7 @@
 
 
 #include <vector>
+#include <list>
 #include <array>
 #include <algorithm>
 #include <cmath>
@@ -57,28 +58,65 @@ public:
 	vector<int> IA;
 	vector<int> JA;
 	vector<int> ON;
-
+	vector<int> DA;
 
 	virtual void buildMeshData() = 0;
 
 
 	//structure
 	int Nx, Ny;
+	void copyData(Mesh* mesh){
+		meshFile = mesh->meshFile;
+		//base
+		X = mesh->X;
+		FP=mesh->FP;
+		CP=mesh->CP;
+		IF=mesh->IF;//face begin index
+		innerFaceBegin=mesh->innerFaceBegin;
+
+		faceNum=mesh->faceNum;
+		innerFaceNum=mesh->innerFaceNum;
+		cellNum=mesh->cellNum;
+		boundaryFaceNum=mesh->boundaryFaceNum;
+		nodeNum=mesh->nodeNum;
+		boundaryPatchNum=mesh->boundaryPatchNum;
+
+		IC=mesh->IC;//cell face begin
+
+		//topology
+		FC=mesh->FC;
+		CF=mesh->CF;
+
+		//geometry
+		 F_a=mesh->F_a;
+		F_d = mesh->F_d;
+		 C_c = mesh->C_c;
+		 F_c = mesh->F_c;
+		 F_n = mesh->F_n;
+		 C_v = mesh->C_v;
+		 F_e = mesh->F_e;
+
+
+
+
+		//compress sparse row
+		 IA=mesh->IA;
+		JA=mesh->JA;
+		 ON=mesh->ON;
+		 DA = mesh->DA;
+	}
 
 };
 
 
 
 
-
-
-
-
-class GmeshTriangleMesh :public Mesh, public member_t<GmeshTriangleMesh>
-{
+class GmeshTriangleMesh_Imp:public Mesh{
 public:
-	//base
 	vector<int> F_sort;
+	vector<list<int>> JA_l;
+	vector<list<int>::iterator> ON_it;
+	vector<list<int>::iterator> DA_it;
 
 	virtual void buildMeshData(){
 		ReadFromGshFile(meshFile);
@@ -88,7 +126,7 @@ public:
 		generateGeo();
 	}
 
-	void ReadFromGshFile(string fileName){
+	virtual void ReadFromGshFile(string fileName){
 		ifstream input(fileName);
 		string line;
 		while (true){
@@ -165,7 +203,7 @@ public:
 		cellNum = CP.size() / 3;
 	}
 
-	void sortBoundaryFace(){
+	virtual void sortBoundaryFace(){
 		int* _RE = new int[boundaryFaceNum * 3];
 		for (int f = 0; f < boundaryFaceNum; f++){
 			int v0 = FP[f * 2 + 0];
@@ -183,7 +221,7 @@ public:
 		}
 		delete[]_RE;
 	}
-	void buildFace(){
+	virtual void buildFace(){
 		int *_RE = new int[cellNum * 9];	//每条边的相邻面片(v0 v1 c)，其中v0<v1，若有多个相邻面片则重复存储该边。
 		for (int c = 0; c<cellNum; c++)
 		{
@@ -262,7 +300,7 @@ public:
 
 	}
 
-	void CF_on(int i, int inner_f, int* _RE){
+	virtual void CF_on(int i, int inner_f, int* _RE){
 		int v0 = CP[_RE[i * 3 + 2] * 3 + 0];
 		int v1 = CP[_RE[i * 3 + 2] * 3 + 1];
 		int v2 = CP[_RE[i * 3 + 2] * 3 + 2];
@@ -331,7 +369,7 @@ public:
 
 
 
-	void generateCompressedSparseRow(){
+	virtual void generateCompressedSparseRow(){
 		IA.resize(cellNum + 1);
 
 		for (int f = 0; f<innerFaceNum; f++){
@@ -345,27 +383,87 @@ public:
 			IA[i]++;
 			IA[i] += IA[i - 1];
 		}
-		JA.resize(IA[cellNum]);
-		vector<int> count(cellNum);
-		ON.resize(innerFaceNum * 2);
+		JA_l.resize(cellNum,list<int>());
+		ON_it.resize(innerFaceNum * 2,list<int>::iterator());
+		DA_it.resize(cellNum, list<int>::iterator());
 		for (int f = 0; f<innerFaceNum; f++){
 			int innerF = IF[innerFaceBegin] + f;
 			int owner = FC[innerF * 2 + 0];
 			int neighbor = FC[innerF * 2 + 1];
-			JA[IA[owner]] = owner;
-			count[owner]++;
-			ON[f * 2 + 0] = IA[owner] + count[owner];
-			JA[ON[f * 2 + 0]] = neighbor;
 
-			JA[IA[neighbor]] = neighbor;
-			count[neighbor]++;
-			ON[f * 2 + 1] = IA[neighbor] + count[neighbor];
-			JA[ON[f * 2 + 1]] = owner;
+			insertJA(owner, owner,owner);
+			insertJA(owner, neighbor,  f*2+0);
+			insertJA(neighbor, neighbor, neighbor);
+			insertJA(neighbor, owner,  f * 2+1);
 		}
+		JA.resize(IA[cellNum]);
+		
+		for (int c = 0; c < cellNum; c++){
+			int i = IA[c];
+			for (list<int>::iterator it = JA_l[c].begin(); it != JA_l[c].end();it++){
+				JA[i] = *it;
+				i++;
+			}
+		}
+		ON.resize(innerFaceNum * 2);
+		DA.resize(cellNum);
+		for (int f = 0; f < innerFaceNum; f++){
+			int innerF = IF[innerFaceBegin] + f;
+			int owner = FC[innerF * 2 + 0];
+			int neighbor = FC[innerF * 2 + 1];
+			mapON_it2ON(owner, owner,DA,DA_it);
+			mapON_it2ON(owner, f * 2 + 0,ON,ON_it);
+			mapON_it2ON(neighbor, neighbor,DA,DA_it);
+			mapON_it2ON(neighbor, f * 2 + 1,ON,ON_it);
+		}
+	}
+	void mapON_it2ON(int c, int f, vector<int>& data,vector<list<int>::iterator>& pointer){
+		int offset = 0;
+		for (list<int>::iterator it = JA_l[c].begin(); it != pointer[f]; it++){
+			offset++;
+		}
+		data[f] = IA[c] + offset;
+	}
+
+	void insertJA(int c, int c2,int f){
+		if (JA_l[c].empty()){
+			JA_l[c].push_front(c2);
+			if (c==c2){
+				DA_it[f] = JA_l[c].begin();
+			}
+			else{
+				ON_it[f] = JA_l[c].begin();
+			}
+			return;
+		}
+		for (list<int>::iterator it = JA_l[c].begin(); it != JA_l[c].end();it++){
+			if (c2 == *it){
+				DA_it[f] = it;
+				return;
+			}
+			if (it == JA_l[c].begin() && c2 < *it){
+					JA_l[c].push_front(c2);
+					ON_it[f] = JA_l[c].begin();
+					return;
+			}
+			if (it != JA_l[c].end()){
+					list<int>::iterator suc = it;
+					suc++;
+					if (suc != JA_l[c].end() && c2>*it&&c2 < *suc || suc == JA_l[c].end() && c2>*it){
+						JA_l[c].insert(suc, c2);
+						suc--;
+						ON_it[f] = suc;
+						return;
+					}
+
+			}
+
+		}
+
 	}
 
 
-	void generateGeo(){
+	virtual void generateGeo(){
 		C_c.resize(cellNum * 2);
 		C_v.resize(cellNum);
 		//special for triangle shape
@@ -448,36 +546,24 @@ public:
 			}
 		}
 	}
-
-
-
-
 };
 
 
 
-
-
-
-//to be done!
-
-class VersatileGmeshMesh :public Mesh, public member_t<VersatileGmeshMesh>
+class GmeshTriangleMesh :public Mesh, public member_t<GmeshTriangleMesh>
 {
 public:
-	//base
-	vector<int> F_sort;
-
-
-
+	Mesh* imp = new GmeshTriangleMesh_Imp();
 	virtual void buildMeshData(){
-		ReadFromGshFile(meshFile);
-		sortBoundaryFace();
-		buildFace();
-		generateCompressedSparseRow();
-		generateGeo();
+		imp->meshFile = meshFile;
+		imp->buildMeshData();
+		copyData(imp);
 	}
+};
 
-	void ReadFromGshFile(string fileName){
+class VersatileGmeshMesh_Imp :public GmeshTriangleMesh_Imp{
+public :
+	virtual void ReadFromGshFile(string fileName){
 		ifstream input(fileName);
 		string line;
 		while (true){
@@ -574,26 +660,8 @@ public:
 		innerFaceBegin = boundaryPatchNum;
 	}
 
-	void sortBoundaryFace(){
-		int* _RE = new int[boundaryFaceNum * 3];
-		for (int f = 0; f < boundaryFaceNum; f++){
-			int v0 = FP[f * 2 + 0];
-			int v1 = FP[f * 2 + 1];
-			int v_min = v0 < v1 ? v0 : v1;
-			int v_max = v0>v1 ? v0 : v1;
-			_RE[f * 3 + 0] = v_min;
-			_RE[f * 3 + 1] = v_max;
-			_RE[f * 3 + 2] = f;
-		}
-		Quick_Sort_RE(_RE, 0, boundaryFaceNum - 1);
-		F_sort.resize(boundaryFaceNum);
-		for (int f = 0; f < boundaryFaceNum; f++){
-			F_sort[f] = _RE[f * 3 + 2];
-		}
-		delete[]_RE;
-	}
 
-	void buildFace(){
+	virtual void buildFace(){
 		int *_RE;//每条边的相邻面片(v0 v1 c)，其中v0<v1，若有多个相邻面片则重复存储该边。
 		vector<int> _RE_v;
 		for (int c = 0; c<cellNum; c++)
@@ -671,7 +739,7 @@ public:
 
 	}
 
-	void CF_on(int* _RE, int e, int* CF_edge_flag, int face){
+	virtual void CF_on(int* _RE, int e, int* CF_edge_flag, int face){
 		int c = _RE[e * 3 + 2];
 		int cellfaceNum = IC[c + 1] - IC[c];
 		for (int i = 0; i < cellfaceNum; i++){
@@ -690,91 +758,10 @@ public:
 	breakLoop:return;
 	}
 
-	void Quick_Sort_RE(int a[], int l, int r)
-	{
-		if (l<r)
-		{
-			int j = Quick_Sort_Partition_RE(a, l, r);
-
-			Quick_Sort_RE(a, l, j - 1);
-			Quick_Sort_RE(a, j + 1, r);
-		}
-	}
-
-	int Quick_Sort_Partition_RE(int a[], int l, int r)
-	{
-		int pivot[3], i, j, c[3];
-		pivot[0] = a[l * 3 + 0];
-		pivot[1] = a[l * 3 + 1];
-		pivot[2] = a[l * 3 + 2];
-		i = l; j = r + 1;
-		while (1)
-		{
-			do ++i; while ((a[i * 3]<pivot[0] || a[i * 3] == pivot[0] && a[i * 3 + 1] <= pivot[1]) && i <= r);
-			do --j; while (a[j * 3]>pivot[0] || a[j * 3] == pivot[0] && a[j * 3 + 1]> pivot[1]);
-			if (i >= j) break;
-			//Swap i and j			
-			c[0] = a[i * 3 + 0];
-			c[1] = a[i * 3 + 1];
-			c[2] = a[i * 3 + 2];
-			a[i * 3 + 0] = a[j * 3 + 0];
-			a[i * 3 + 1] = a[j * 3 + 1];
-			a[i * 3 + 2] = a[j * 3 + 2];
-			a[j * 3 + 0] = c[0];
-			a[j * 3 + 1] = c[1];
-			a[j * 3 + 2] = c[2];
-		}
-		//Swap l and j
-		c[0] = a[l * 3 + 0];
-		c[1] = a[l * 3 + 1];
-		c[2] = a[l * 3 + 2];
-		a[l * 3 + 0] = a[j * 3 + 0];
-		a[l * 3 + 1] = a[j * 3 + 1];
-		a[l * 3 + 2] = a[j * 3 + 2];
-		a[j * 3 + 0] = c[0];
-		a[j * 3 + 1] = c[1];
-		a[j * 3 + 2] = c[2];
-		return j;
-	}
+	
 
 
-
-
-	void generateCompressedSparseRow(){
-		IA.resize(cellNum + 1);
-
-		for (int f = 0; f<innerFaceNum; f++){
-			int innerF = IF[innerFaceBegin] + f;
-			int owner = FC[innerF * 2 + 0];
-			int neighbor = FC[innerF * 2 + 1];
-			IA[owner + 1]++;
-			IA[neighbor + 1]++;
-		}
-		for (int i = 1; i<cellNum + 1; i++){
-			IA[i]++;
-			IA[i] += IA[i - 1];
-		}
-		JA.resize(IA[cellNum]);
-		vector<int> count(cellNum);
-		ON.resize(innerFaceNum * 2);
-		for (int f = 0; f<innerFaceNum; f++){
-			int innerF = IF[innerFaceBegin] + f;
-			int owner = FC[innerF * 2 + 0];
-			int neighbor = FC[innerF * 2 + 1];
-			JA[IA[owner]] = owner;
-			count[owner]++;
-			ON[f * 2 + 0] = IA[owner] + count[owner];
-			JA[ON[f * 2 + 0]] = neighbor;
-
-			JA[IA[neighbor]] = neighbor;
-			count[neighbor]++;
-			ON[f * 2 + 1] = IA[neighbor] + count[neighbor];
-			JA[ON[f * 2 + 1]] = owner;
-		}
-	}
-
-
-	void generateGeo(){
+	virtual void generateGeo(){
 		C_c.resize(cellNum * 2);
 		C_v.resize(cellNum);
 		//volumn
@@ -864,6 +851,26 @@ public:
 		}
 	}
 };
+
+
+
+
+
+
+class VersatileGmeshMesh :public Mesh, public member_t<VersatileGmeshMesh>
+{
+public:
+	Mesh* imp = new VersatileGmeshMesh_Imp();
+	virtual void buildMeshData(){
+		imp->meshFile = meshFile;
+		imp->buildMeshData();
+		copyData(imp);
+	}
+
+};
+
+
+
 
 
 

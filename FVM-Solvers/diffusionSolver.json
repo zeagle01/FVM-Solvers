@@ -23,6 +23,7 @@
          "////////////////////////":"Laplace/unstructure_Laplace ",  
       "Laplace_operator":"Laplace" ,
       
+      
       "cell_gradient":"GS_gradient",
       
        "face_average":[
@@ -30,9 +31,9 @@
            {"type":"linear_average_beo"}
        ],
       
-     "//////////////////////////1":"GS_iteration/OpenMP_Jacobi_iteration/GPU_Jacobi_iteration/GPU_Jacobi_Solver_vector ",    
+     "//////////////////////////1":"GS_iteration/OpenMP_Jacobi_iteration/GPU_Jacobi_iteration/GPU_Jacobi_Solver_vector/GMRES",    
      "linear_equation_solvers"  :[
-         {"type":"GS_iteration","converge_threhold":"1e-6","max_step":"100000","check_step":"200"}
+         {"type":"GMRES","converge_threhold":"1e-6","max_step":"100000","check_step":"200"}
      ],
        
    

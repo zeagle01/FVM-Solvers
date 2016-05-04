@@ -132,8 +132,8 @@ public:
 		D[0].setUniformValue(mesh, 0);
 		D[1].setUniformValue(mesh, 0);
 		for (int c = 0; c < mesh->cellNum; c++){
-			D[0].inner[c] = mesh->C_v[c] / V_eq[0].A[mesh->IA[c]];
-			D[1].inner[c] = mesh->C_v[c] / V_eq[1].A[mesh->IA[c]];
+			D[0].inner[c] = mesh->C_v[c] / V_eq[0].A[mesh->DA[c]];
+			D[1].inner[c] = mesh->C_v[c] / V_eq[1].A[mesh->DA[c]];
 		}
 		vector<double> df0 = faceReconstruct[1]->apply(D[0], mesh);
 		vector<double> df1 = faceReconstruct[1]->apply(D[1], mesh);

@@ -54,12 +54,12 @@ public:
 
 
 	static T rootOfSquareSum(vector<T> E1, vector<T> E2){
-	transform(E1.cbegin(), E1.cend(), E2.cbegin(), E2.begin(), minus<T>());
-	transform(E2.begin(), E2.end(), E2.begin(), E2.begin(), multiplies<T>());
-	T error = accumulate(E2.begin(), E2.end(), (T)0);//have to force convert to T type unless the result is always 0
-	//error = inner_product(pre.inner.cbegin(), pre.inner.cend(), pre.inner.cbegin(),
-	//	1, plus<T>(), plus<T>());
-	return sqrt(error);
+		transform(E1.cbegin(), E1.cend(), E2.cbegin(), E2.begin(), minus<T>());
+		transform(E2.begin(), E2.end(), E2.begin(), E2.begin(), multiplies<T>());
+		T error = accumulate(E2.begin(), E2.end(), (T)0);//have to force convert to T type unless the result is always 0
+		//error = inner_product(pre.inner.cbegin(), pre.inner.cend(), pre.inner.cbegin(),
+		//	1, plus<T>(), plus<T>());
+		return sqrt(error);
 	}
 
 
@@ -70,6 +70,46 @@ public:
 		}
 		return sqrt(sum);
 	}
+
+	static double length(double* v, int n){
+		double r = 0;
+		for (int i = 0; i < n; i++){
+			r += v[i] * v[i];
+		}
+		return sqrt(r);
+	}
+
+	static void plus_minus(double c, double* x, int n, double* r){
+		for (int i = 0; i < n; i++){
+			r[i] += c*x[i];
+		}
+	}
+
+
+	static void  scalarMul(double scalar, int n, double* r){
+		for (int i = 0; i < n; i++){
+			r[i] = r[i] * scalar;
+		}
+	}
+
+	static double dot(double* x1, double* x2, int n){
+		double r = 0;
+		for (int i = 0; i < n; i++){
+			r += x1[i] * x2[i];
+		}
+		return r;
+	}
+	static void reverse(double* r, int n){
+		for (int i = 0; i < n; i++){
+			r[i] = -r[i];
+		}
+	}
+	static void copyArray(double* x, int n, double* x_new){
+		for (int i = 0; i < n; i++){
+			x_new[i] = x[i];
+		}
+	}
+
 
 };
 

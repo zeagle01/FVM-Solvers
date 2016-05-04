@@ -53,6 +53,16 @@ public:
 		transform(E1.b.begin(), E1.b.end(), E2.b.begin(), E3.b.begin(), std::plus<double>());
 		return E3;
 	}
+
+
+	static void  MatrixVectorMul(double* A, int* IA, int* JA, double* x,int n,double* r){
+		for (int i = 0; i<n; i++){
+			for (int j = IA[i]; j<IA[i + 1]; j++){
+				r[i] += A[j] * x[JA[j]];
+			}
+		}
+	}
+
 };
 
 class CellField{
